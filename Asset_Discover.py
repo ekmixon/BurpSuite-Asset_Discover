@@ -41,10 +41,11 @@ class BurpExtender(IBurpExtender, IScannerCheck):
     # issues from our scans include affected parameters/values in the detail,
     # which we will want to report as unique issue instances
     def consolidateDuplicateIssues(self, existingIssue, newIssue):
-        if (existingIssue.getIssueDetail() == newIssue.getIssueDetail()):
-            return -1
-        else:
-            return 0
+        return (
+            -1
+            if (existingIssue.getIssueDetail() == newIssue.getIssueDetail())
+            else 0
+        )
 
     # Implement the doPassiveScan method of IScannerCheck interface
     # Burp Scanner invokes this method for each base request/response that is passively scanned.
@@ -70,7 +71,7 @@ class BurpExtender(IBurpExtender, IScannerCheck):
         tmp_issues = self._CustomScans.findRegEx(regex, issuename, issuelevel, issuedetail)
 
         # Add the issues from findRegEx to the list of issues to be returned
-        scan_issues = scan_issues + tmp_issues
+        scan_issues += tmp_issues
 
         tmp_issues = []
 
@@ -156,10 +157,7 @@ class BurpExtender(IBurpExtender, IScannerCheck):
 
         # Finally, per the interface contract, doPassiveScan needs to return a
         # list of scan issues, if any, and None otherwise
-        if len(scan_issues) > 0:
-            return scan_issues
-        else:
-            return None
+        return scan_issues if len(scan_issues) > 0 else None
 
 class CustomScans:
     def __init__(self, requestResponse, callbacks):
